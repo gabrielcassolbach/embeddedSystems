@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stm32f4xx.h": "c",
+        "delay.h": "c",
+        "stm32f411xe.h": "c",
+        "stdint.h": "c"
+    }
+}
