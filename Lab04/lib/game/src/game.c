@@ -55,8 +55,7 @@ void update(GameContext *ctx)  {
 
 void run(){
     GameContext ctx;
-    ctx.current_state = GAME_STATE_MENU;
-    enable_raw_mode();
+    ctx.current_state = GAME_STATE_PLAYING;
 
     for(int i = 0; i < TOTAL_OBSTACLES; i++){
         ctx.obstacles[i].active = 0;
@@ -68,7 +67,8 @@ void run(){
 
     ctx.frame_counter = 0;
 
-    ctx.dino_x = PATH_WIDTH/2;
+    ctx.dino_x = PATH_WIDTH/2 - DINO_WIDTH/2;
+    ctx.lastdraw_dino_x = 0;
 
     while(1){
         render(&ctx);

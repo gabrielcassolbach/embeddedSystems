@@ -3,10 +3,10 @@
 #define TOTAL_OBSTACLES 5
 #define OBSTACLE_SPEED 2
 
-#define PATH_WIDTH 100
-#define PATH_TOP 100
+#define PATH_WIDTH 480
+#define PATH_TOP 320
 
-#define DINO_WIDTH 10
+#define DINO_WIDTH 40
 
 #define FRAMERATE 60
 
@@ -30,6 +30,7 @@ static int WIDTHS[N_OBSTACLES] = {50, 20, 10};
 
 typedef struct {
     int x, y, width; 
+    int prev_y;
     int active; 
     ObstacleType type; 
 } Obstacle;
@@ -38,6 +39,7 @@ typedef struct {
     GameState current_state;
     Obstacle obstacles[TOTAL_OBSTACLES];
     int dino_x;
+    int lastdraw_dino_x; 
     int frame_counter; 
     int score;
 } GameContext; 
