@@ -43,6 +43,7 @@ void update_playing(GameContext *ctx){
             if(ctx->obstacles[i].y <= DINO_WIDTH)
                 if((ctx->obstacles[i].x+ctx->obstacles[i].width >= ctx->dino_x) && (ctx->obstacles[i].x <= ctx->dino_x + DINO_WIDTH)){
                     ctx->current_state = GAME_STATE_GAME_OVER;
+                    display_send_command("page game_over");
                     printf("CORIIASFJPASIFJPOASIFJAPSOIF");
                 }
 
