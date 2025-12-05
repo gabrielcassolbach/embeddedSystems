@@ -9,16 +9,23 @@
 #include <stdio.h>
 #include "game.h"
 #include "display.h"
+#include "input.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 static inline int  uart_rx_ready(void) { return (USART1->SR & USART_SR_RXNE) != 0; }
 static inline char uart_getc(void)     { return (char)USART1->DR; }
 void delay_us(uint32_t us);
 
+extern SemaphoreHandle_t xTimeMutex;
+extern int time_sec;
+
 #define TRIG_PORT GPIOA
 #define TRIG_PIN  2
 #define ECHO_PORT GPIOA
 #define ECHO_PIN  1
-
 
 static inline uint32_t micros(void){
     return (uint32_t)((uint64_t)DWT->CYCCNT * 1000000ULL / SystemCoreClock);
@@ -51,33 +58,41 @@ static void erase_time(int number){
     draw_time(number, C_BLACK);
 }
 
-void button_init(void) {
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-    GPIOA->MODER &= ~(3UL << (8 * 2));
-    GPIOA->PUPDR &= ~(3UL << (8 * 2));
-}
-
-uint8_t button_read(void) {
-    return (GPIOA->IDR & (1 << 8)) ? 1 : 0;
-}
-
 void clear_screen(void) {
     display_send_command("cls 65535");   // White background
 }
 
+void vTimeTask(void *arg) {
+    (void)arg;
+    xTimeMutex = xSemaphoreCreateMutex();
+    for (;;) {
+        if (xSemaphoreTake(xTimeMutex, portMAX_DELAY) == pdTRUE) {
+            time_sec += 1;
+            xSemaphoreGive(xTimeMutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 int main(void){
-    delay_init();
-    serial_stdio_init(115200);   
-    delay_us_init();
+    serial_stdio_init(115200);
+    delay_us_init();   
     i2c_gpio_init();
+ 
     button_init();    
-
     display_init();
-    delay_ms(1000);
-    clear_screen();
 
-    run();
+    printf("starting threads\n");
+
+    // Define THREAD do input - Leitura do Acelerômetro.
+    xTaskCreate(vInputTask, "input", 256, NULL, 1, NULL);
+    xTaskCreate(run, "main_thread", 256, NULL, 1, NULL);
+    xTaskCreate(vTimeTask, "time", 256, NULL, 1, NULL);
     
+    printf("scheduling tasks\n");
+    vTaskStartScheduler();
+
+    while (1) { __NOP(); }
     return 0;
 }
 

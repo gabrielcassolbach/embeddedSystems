@@ -53,9 +53,10 @@ void update(GameContext *ctx)  {
     ctx->frame_counter++;
 }
 
-void run(){
+void run(void *arg){
+    printf("running...\n");
     GameContext ctx;
-    ctx.current_state = GAME_STATE_PLAYING;
+    ctx.current_state = GAME_STATE_MENU;
 
     for(int i = 0; i < TOTAL_OBSTACLES; i++){
         ctx.obstacles[i].active = 0;
@@ -69,6 +70,7 @@ void run(){
 
     ctx.dino_x = PATH_WIDTH/2 - DINO_WIDTH/2;
     ctx.lastdraw_dino_x = 0;
+    display_send_command("page menu");
 
     while(1){
         render(&ctx);

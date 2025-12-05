@@ -1,0 +1,8 @@
+{
+  "name": "FreeRTOS-Kernel",
+  "version": "10.6.1",
+  "build": {
+    "srcDir": "PIO",
+    "srcFilter": ["+<*.c>"]
+  }
+}

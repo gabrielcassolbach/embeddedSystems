@@ -4,7 +4,24 @@
 #include <stdlib.h>
 #include "i2c.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+
 uint8_t detected_addr = 0;
+int player_input = 0; 
+SemaphoreHandle_t xInputMutex;
+
+void button_init(void) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; 
+    GPIOA->MODER &= ~(3UL << (8 * 2));
+    GPIOA->PUPDR &= ~(3UL << (8 * 2));
+    GPIOA->PUPDR |=  (1UL << (8 * 2));
+}
+
+uint8_t button_read(void) {
+    return (GPIOA->IDR & (1 << 8)) ? 1 : 0;
+}
 
 
 int mpu_init(uint8_t addr){
@@ -36,16 +53,10 @@ uint8_t mpu_connect(void){
             }
         }
     }
-    if (detected_addr == 0xFF){
-        //printf("MPU6050 nao detectado em 0x68/0x69\n");
-        return 0x0;
-    }
-    //printf("MPU detectado em 0x%02X\n", detected_addr);
 
-    if (mpu_init(detected_addr) != 0){
-        //printf("Falha ao inicializar MPU\n");
-        return 0x0;
-    }
+    if (detected_addr == 0xFF) return 0x0;
+    
+    if (mpu_init(detected_addr) != 0) return 0x0;
 
     return detected_addr;
 }
@@ -60,16 +71,28 @@ int get_player_input(void) {
         ay = (int)(r_ay*1000);
         
 
-    if((abs(ay) >= 50)) return ay/20;
+    if((abs(ay) >= 50)) return -ay/20;
     return 0; 
 }
 
-int is_button_pressed(void) {
-    return 0;
+uint8_t is_button_pressed(void) {
+    printf("button: %d\n", button_read());
+    return button_read();
 }
+ 
+void vInputTask(void *arg) {
+    (void)arg;
+    xInputMutex = xSemaphoreCreateMutex();
 
-unsigned char get_button_pressed(void) {
-     
+    for (;;) {    
+        int result = get_player_input();
+        if (xSemaphoreTake(xInputMutex, portMAX_DELAY) == pdTRUE) {
+            player_input = result; 
+            xSemaphoreGive(xInputMutex);
+        }
+          
+    }
+    
 }
 
 

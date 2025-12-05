@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include "game_over.h"
 #include "input.h"
+#include "FreeRTOS.h"
 
 void update_game_over(GameContext *ctx){
     if(is_button_pressed()){
+        for(int i = 0; i < TOTAL_OBSTACLES; i++)
+            ctx->obstacles[i].active = 0;   
+            
+        
+        
         ctx->current_state = GAME_STATE_MENU;
+        
         display_send_command("page menu");
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 

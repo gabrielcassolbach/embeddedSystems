@@ -1,16 +1,18 @@
 #pragma once
+#include <pthread.h>
 
 #define TOTAL_OBSTACLES 5
-#define OBSTACLE_SPEED 2
+#define OBSTACLE_SPEED 10
 
 #define PATH_WIDTH 480
-#define PATH_TOP 320
-
+#define PATH_TOP 0
+#define SCREEN_TOP 320
 #define DINO_WIDTH 40
 
 #define FRAMERATE 60
 
-#define SPAWN_PERIOD FRAMERATE/1 
+#define SPAWN_PERIOD FRAMERATE/4
+
 
 typedef enum {
     GAME_STATE_MENU,

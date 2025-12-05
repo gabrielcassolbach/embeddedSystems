@@ -3,6 +3,10 @@
         "stm32f4xx.h": "c",
         "delay.h": "c",
         "stm32f411xe.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "game.h": "c",
+        "game_objects.h": "c",
+        "input.h": "c",
+        "pthread.h": "c"
     }
 }
