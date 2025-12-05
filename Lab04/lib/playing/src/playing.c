@@ -40,11 +40,14 @@ void update_playing(GameContext *ctx){
             ctx->obstacles[i].prev_y = ctx->obstacles[i].y;
             ctx->obstacles[i].y -= OBSTACLE_SPEED;
             
-            if(ctx->obstacles[i].y <= 0){
+            if(ctx->obstacles[i].y <= DINO_WIDTH)
                 if((ctx->obstacles[i].x+ctx->obstacles[i].width >= ctx->dino_x) && (ctx->obstacles[i].x <= ctx->dino_x + DINO_WIDTH)){
                     ctx->current_state = GAME_STATE_GAME_OVER;
                     printf("CORIIASFJPASIFJPOASIFJAPSOIF");
                 }
+
+            if(ctx->obstacles[i].y <= 0){
+                
                 printf("obsx %d\n obsw%d dinox %d\n dinow %d\n ", ctx->obstacles[i].x, ctx->obstacles[i].width, ctx->dino_x, DINO_WIDTH);
                 ctx->obstacles[i].active = 0;
             }
@@ -78,6 +81,12 @@ void clear_dino(int x) {
     display_send_command(cmd);
 }
 
+void draw_clock(int min, int sec){
+    char cmd[64];
+    sprintf(cmd, "t0.txt=\"%2d:%2d\"", min, sec);
+    display_send_command(cmd);
+}
+
 void render_playing(GameContext *ctx){
     
     
@@ -95,6 +104,14 @@ void render_playing(GameContext *ctx){
         }
         
     }
+
+    int min, sec;
+
+    sec = ctx->frame_counter/FRAMERATE;
+    min = sec/60;
+    sec = sec%60;
+
+
 
     clear_dino(ctx->lastdraw_dino_x);
     draw_dino(ctx->dino_x);

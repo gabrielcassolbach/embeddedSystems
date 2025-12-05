@@ -7,6 +7,13 @@ void update_game_over(GameContext *ctx){
         ctx->current_state = GAME_STATE_MENU;
 }
 
-void render_game_over(GameContext *ctx){
+void set_score(int score){
+    char cmd[64];
+    sprintf(cmd, "t2.txt=\"%d\"", score);
+    display_send_command(cmd);
+}
 
+void render_game_over(GameContext *ctx){
+ 
+    set_score(ctx->score);
 }
